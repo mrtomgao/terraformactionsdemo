@@ -8,6 +8,7 @@ jobs:
   terraform:
     name: 'Terraform'
     runs-on: ubuntu-latest
+    environment: 'DeployToQA'
     steps:
       - name: 'Checkout'
         uses: actions/checkout@master
@@ -25,4 +26,3 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         run: terraform plan
-        environment: 'DeployToQA'
