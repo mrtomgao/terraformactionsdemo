@@ -5,7 +5,7 @@ on:
       - main
 
 jobs:
-  terraform-plan:
+  validate:
     name: 'Validation Step'
     runs-on: ubuntu-latest
     steps:
@@ -25,7 +25,7 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         run: terraform plan
-  terraform-apply:
+  apply:
     name: 'Deployment Step'
     runs-on: ubuntu-latest
     environment: 'TomsAWS-QA'
@@ -45,5 +45,15 @@ jobs:
         env:
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
-        run: terraform apply -auto-approve
+        run: terraform plan
+  complete:
+    name: 'Complete or Rollback?'
+    runs-on: ubuntu-latest
+    environment: 'TomsAWS-QA'
+    steps:
+      - name: 'Say hi'
+        run: echo "Hello World"
+
+      
+
 
