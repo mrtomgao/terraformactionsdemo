@@ -10,7 +10,7 @@ terraform {
 
   backend "s3" {
       bucket = "toms-tf-demo-remotestate"
-      key = "remote.state"
+      key = "terraformremote.state"
       region = "us-west-1"
   }
 }
