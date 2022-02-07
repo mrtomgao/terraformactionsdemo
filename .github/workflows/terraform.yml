@@ -17,4 +17,4 @@ jobs:
           tf_actions_version: 0.12.18
           tf_actions_subcommand: "init"
         env:
-          GITHUB_TOKEN: 'shitputotken'
+          GITHUB_TOKEN: ${{secrets.PA_TOKEN}}
