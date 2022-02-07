@@ -14,7 +14,7 @@ jobs:
       - name: 'Terraform Format'
         uses: hashicorp/terraform-github-actions@master
         with:
-          tf_actions_version: 3.27
+          tf_actions_version: 0.14.9
           tf_actions_subcommand: "init"
         env:
           GITHUB_TOKEN: ${{secrets.PA_TOKEN}}
