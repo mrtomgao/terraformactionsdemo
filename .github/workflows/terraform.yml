@@ -15,6 +15,6 @@ jobs:
         uses: hashicorp/terraform-github-actions@master
         with:
           tf_actions_version: 0.12.18
-          tf_actions_subcommand: ['init','plan']
+          tf_actions_subcommand: "init"
         env:
-          GITHUB_TOKEN: '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'
+          GITHUB_TOKEN: 'shitputotken'
