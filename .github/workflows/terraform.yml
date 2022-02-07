@@ -18,3 +18,10 @@ jobs:
           tf_actions_subcommand: "init"
         env:
           GITHUB_TOKEN: ${{secrets.PA_TOKEN}}
+      - name: 'Terraform Validate'
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: 0.14.9
+          tf_actions_subcommand: "validate"
+        env:
+          GITHUB_TOKEN: ${{secrets.PA_TOKEN}}
