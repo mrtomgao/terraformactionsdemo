@@ -5,10 +5,9 @@ on:
       - main
 
 jobs:
-  terraform:
-    name: 'Terraform'
+  terraform-plan:
+    name: 'Validation Step'
     runs-on: ubuntu-latest
-    environment: 'DeployToQA'
     steps:
       - name: 'Checkout'
         uses: actions/checkout@master
@@ -26,3 +25,25 @@ jobs:
           AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
           AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
         run: terraform plan
+  terraform-apply:
+    name: 'Deployment Step'
+    runs-on: ubuntu-latest
+    environment: 'TomsAWS-QA'
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@master
+      - name: 'Terraform Format'
+        uses: hashicorp/terraform-github-actions@master
+        with:
+          tf_actions_version: 0.14.9
+          tf_actions_subcommand: "init"
+        env:
+          GITHUB_TOKEN: ${{secrets.PA_TOKEN}}
+      - name: 'Terraform Validate'
+        run: terraform validate
+      - name: 'Terraform Apply'
+        env:
+          AWS_ACCESS_KEY_ID: ${{secrets.AWS_ACCESS_KEY_ID}}
+          AWS_SECRET_ACCESS_KEY: ${{secrets.AWS_SECRET_ACCESS_KEY}}
+        run: terraform Apply
+
