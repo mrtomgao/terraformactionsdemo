@@ -1,2 +1,2 @@
-deployment_environment = "dev"
-application_name = "tomsapp123"
+deployment_environment = "qa"
+application_name = "testappname"
