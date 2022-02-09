@@ -1,37 +1,27 @@
-terraform {
-  required_providers {
-    aws = {
-      source  = "hashicorp/aws"
-      version = "~> 3.27"
-    }
-  }
 
-  required_version = ">= 0.14.9"
-
-
-}
-
-provider "aws" {
-  profile = "default"
-  region  = "us-west-1"
-}
-
-resource "aws_s3_bucket" "toms-tf-demo-bucket-raw" {
-  bucket = "toms-tf-demo-bucket-raw"
+resource "aws_s3_bucket" "bucket_landing" {
+  bucket = "${var.application_name}-s3-land-${var.deployment_environment}"
   acl    = "private"
-
   versioning {
     enabled = true
   }
-
-  tags = {
-    Name        = "Toms TF Bucket for Raw"
-    Environment = "QA"
-  }
 }
 
-resource "aws_iam_role" "toms-tf-demo-role" {
-  name = "toms-tf-demo-role"
+resource "aws_s3_bucket" "bucket_code" {
+  bucket = "${var.application_name}-s3-code-${var.deployment_environment}"
+  acl    = "private"
+}
+
+resource "aws_s3_bucket_object" "bucket_object" {
+    for_each = fileset("assets/", "*")
+    bucket = aws_s3_bucket.bucket_code.id
+    key = each.value
+    source = "assets/${each.value}"
+    etag = filemd5("assets/${each.value}")
+}
+
+resource "aws_iam_role" "application-role" {
+  name = "custrole-${var.application_name}-${var.deployment_environment}"
   assume_role_policy = jsonencode({
     Version = "2012-10-17"
     Statement = [
@@ -47,16 +37,25 @@ resource "aws_iam_role" "toms-tf-demo-role" {
   })
 }
 
-resource "aws_glue_catalog_database" "toms-tf-demo-cat-db" {
-  name = "toms-tf-demo-cat-db"
+resource "aws_glue_catalog_database" "glue-database" {
+  name = "airtable-${var.application_name}-${var.deployment_environment}"
 }
 
-resource "aws_glue_crawler" "toms-tf-demo-crawler" {
-  database_name = aws_glue_catalog_database.toms-tf-demo-cat-db.name
-  name          = "toms-tf-demo-crawler"
-  role          = aws_iam_role.toms-tf-demo-role.arn
+resource "aws_glue_crawler" "glue-crawler" {
+  database_name = aws_glue_catalog_database.glue-database.name
+  name          = "airtable-${var.application_name}-${var.deployment_environment}"
+  role          = aws_iam_role.application-role.arn
 
   s3_target {
-    path = "s3://${aws_s3_bucket.toms-tf-demo-bucket-raw.bucket}"
+    path = "s3://${aws_s3_bucket.bucket_landing.bucket}"
+  }
+}
+
+resource "aws_glue_job" "glue-job" {
+  name     = "airtable-${var.application_name}-${var.deployment_environment}"
+  role_arn = aws_iam_role.application-role.arn
+
+  command {
+    script_location = "s3://${aws_s3_bucket.bucket_code.bucket}/example.py"
   }
 }
